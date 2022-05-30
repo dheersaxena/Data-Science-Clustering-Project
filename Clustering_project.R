@@ -1,41 +1,31 @@
-setwd(choose.dir())
+library(gdata)
 
-raw_data <- read.csv("unempstates.csv")
-View(raw_data[1:3,])
+unemp = read.csv("unemp.csv")
+unempstates = read.csv("unempstates.csv")
+View(unemp)
 
-## time sequence plots of three series
-plot(raw_data[,5],type="l",ylim=c(0,12),xlab="month",ylab="unemployment rate")
-points(raw_data[,32],type="l", cex = .5, col = "dark blue") ## New York
-points(raw_data[,15],type="l", cex = .5, col = "dark red") ## Iowa
-## transpose the data
-## then we have 50 rows (states) and 416 columns (time periods)
+plot(unempstates[,10],type="l",xlab="month",ylab="unemployment rate",col="red")
+View(unemp)
+View(unempstates)
+plot(unemp$mean,unemp$stddev)
+unempstates = t(unempstates)
 
-
-rawt=matrix(nrow=50,ncol=416)
-rawt=t(raw_data)
-View(rawt[1:3,])
-## k-means clustering in 416 dimensions
+#on 416 dimensions
 set.seed(1)
-grpunemp2 <- kmeans(rawt, centers=2, nstart=10)
-sort(grpunemp2$cluster)
-grpunemp3 <- kmeans(rawt, centers=3, nstart=10)
-sort(grpunemp3$cluster)
-grpunemp4 <- kmeans(rawt, centers=4, nstart=10)
-sort(grpunemp4$cluster)
-grpunemp5 <- kmeans(rawt, centers=5, nstart=10)
-sort(grpunemp5$cluster)
-
-
-
-## another analysis
-
-## k-means clustering on 2 dimensions (mean, stddev)
-unemp <- read.csv("unemp.csv")
-View(unemp[1:3,])
-set.seed(1)
-grpunemp <- kmeans(unemp[,c("mean","stddev")], centers=3, nstart=10)
-## list of cluster assignments
+grpunemp <- kmeans(unempstates, centers=3, nstart=10)
 o=order(grpunemp$cluster)
-data.frame(unemp$state[o],grpunemp$cluster[o])
+d1 = data.frame(unemp$state[o],grpunemp$cluster[o])
+
+
+
+
+#on 2 dimensions
+set.seed(1)
+grpunemp1 <- kmeans(unemp[,c("mean","stddev")], centers=3, nstart=10)
+o1 = order(grpunemp1$cluster)
+d2 = data.frame(unemp$state[o1],grpunemp1$cluster[o1])
 plot(unemp$mean,unemp$stddev,type="n",xlab="mean", ylab="stddev")
-text(x=unemp$mean,y=unemp$stddev,labels=unemp$state, col=grpunemp$cluster+1)
+text(x=unemp$mean,y=unemp$stddev,labels=unemp$state, col=grpunemp1$cluster+1)
+
+View(d1)
+View(d2)
